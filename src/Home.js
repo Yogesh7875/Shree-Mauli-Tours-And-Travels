@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Places from "./Places";
 import { 
   FiArrowLeft, 
@@ -8,13 +8,61 @@ import {
   FiDollarSign,
   FiNavigation2, // Airplane alternative
   FiTruck,       // Car alternative
-  FiGift
+  FiGift,
+  FiStar        // Added for testimonials
 } from "react-icons/fi";
 import busImage from "./img/bus.jpg";
 import greenBusImage from "./img/greenBus.jpg";
+import { motion } from "framer-motion"; // Import for animations
 
 const Home = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [isVisible, setIsVisible] = useState({});
+  const sectionRefs = {
+    packages: useRef(null),
+    outstation: useRef(null),
+    special: useRef(null)
+  };
+
+  // Animation variants
+  const fadeIn = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.6 } }
+  };
+
+  const slideUp = {
+    hidden: { y: 50, opacity: 0 },
+    visible: { y: 0, opacity: 1, transition: { duration: 0.5 } }
+  };
+
+  const staggerChildren = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const cardVariant = {
+    hidden: { y: 20, opacity: 0 },
+    visible: { 
+      y: 0, 
+      opacity: 1, 
+      transition: { 
+        duration: 0.4,
+        type: "spring",
+        stiffness: 100
+      } 
+    },
+    hover: { 
+      y: -10, 
+      boxShadow: "0 10px 20px rgba(0,0,0,0.15)",
+      transition: { duration: 0.3 }
+    }
+  };
+
   const slides = [
     { 
       image: busImage, 
@@ -27,13 +75,6 @@ const Home = () => {
       text: "Hybrid buses reducing carbon emissions by 40%" 
     }
   ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % slides.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [slides.length]);
 
   const packages = [
     { 
@@ -49,52 +90,143 @@ const Home = () => {
       highlights: ["Camping", "Hiking", "Local Cuisine"] 
     }
   ];
+  
+  // Testimonials section data
+  const testimonials = [
+    {
+      name: "Rahul Sharma",
+      location: "Mumbai",
+      text: "The Coastal Explorer package exceeded our expectations. The beach resorts were amazing!"
+    },
+    {
+      name: "Priya Patel",
+      location: "Delhi",
+      text: "Our Mountain Trek was the highlight of our year. The guides were knowledgeable and friendly."
+    },
+    {
+      name: "Amit Kumar",
+      location: "Bangalore",
+      text: "The bus service was punctual and comfortable. Will definitely book again for our next trip!"
+    }
+  ];
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setActiveIndex((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    
+    const observerOptions = {
+      threshold: 0.2
+    };
+    
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          setIsVisible(prev => ({...prev, [entry.target.id]: true}));
+        }
+      });
+    }, observerOptions);
+    
+    // Observe all section refs
+    Object.entries(sectionRefs).forEach(([key, ref]) => {
+      if (ref.current) {
+        observer.observe(ref.current);
+      }
+    });
+    
+    return () => {
+      clearInterval(interval);
+      Object.values(sectionRefs).forEach(ref => {
+        if (ref.current) {
+          observer.unobserve(ref.current);
+        }
+      });
+    };
+  }, [slides.length]);
 
   return (
     <div>
-      {/* Carousel Section */}
+      {/* Carousel Section with Animation */}
       <div style={styles.carousel}>
         {slides.map((slide, index) => (
-          <div
+          <motion.div
             key={index}
-            style={{
-              ...styles.carouselItem,
-              transform: `translateX(${(index - activeIndex) * 100}%)`
+            initial={{ opacity: 0 }}
+            animate={{ 
+              opacity: index === activeIndex ? 1 : 0,
+              x: `${(index - activeIndex) * 100}%`
             }}
+            transition={{ duration: 0.7 }}
+            style={styles.carouselItem}
           >
             <div style={styles.imageContainer}>
               <img src={slide.image} alt={slide.title} style={styles.carouselImage} />
               <div style={styles.overlay}></div>
             </div>
             
-            <div style={styles.carouselCaption}>
+            <motion.div 
+              style={styles.carouselCaption}
+              initial={{ x: -50, opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.8 }}
+            >
               <h2 style={styles.captionTitle}>{slide.title}</h2>
               <p style={styles.captionText}>{slide.text}</p>
-              <button style={styles.ctaButton}>Book Now</button>
-            </div>
-          </div>
+              <motion.button 
+                style={styles.ctaButton}
+                whileHover={{ scale: 1.05, backgroundColor: "#FF5252" }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Book Now
+              </motion.button>
+            </motion.div>
+          </motion.div>
         ))}
 
-        <button 
+        <motion.button 
           style={styles.prevButton} 
           onClick={() => setActiveIndex(prev => prev === 0 ? slides.length - 1 : prev - 1)}
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.3)" }}
+          whileTap={{ scale: 0.9 }}
         >
           <FiArrowLeft />
-        </button>
-        <button 
+        </motion.button>
+        <motion.button 
           style={styles.nextButton} 
           onClick={() => setActiveIndex(prev => (prev + 1) % slides.length)}
+          whileHover={{ scale: 1.1, backgroundColor: "rgba(255,255,255,0.3)" }}
+          whileTap={{ scale: 0.9 }}
         >
           <FiArrowRight />
-        </button>
+        </motion.button>
       </div>
 
-      {/* Tour Packages Section */}
-      <div style={styles.tourPackages}>
-        <h2 style={styles.sectionTitle}>Popular Packages</h2>
-        <div style={styles.packageGrid}>
+      {/* Tour Packages Section with Animation */}
+      <motion.div 
+        ref={sectionRefs.packages}
+        id="packages-section"
+        style={styles.tourPackages}
+        initial="hidden"
+        animate={isVisible["packages-section"] ? "visible" : "hidden"}
+        variants={fadeIn}
+      >
+        <motion.h2 
+          style={styles.sectionTitle}
+          variants={slideUp}
+        >
+          Popular Packages
+        </motion.h2>
+        <motion.div 
+          style={styles.packageGrid}
+          variants={staggerChildren}
+        >
           {packages.map((pkg, index) => (
-            <div key={index} style={styles.packageCard}>
+            <motion.div 
+              key={index} 
+              style={styles.packageCard}
+              variants={cardVariant}
+              whileHover="hover"
+            >
               <h3 style={styles.packageTitle}>{pkg.name}</h3>
               <div style={styles.packageInfo}>
                 <span><FiClock /> {pkg.duration}</span>
@@ -102,65 +234,170 @@ const Home = () => {
               </div>
               <ul style={styles.highlights}>
                 {pkg.highlights.map((h, i) => (
-                  <li key={i} style={styles.highlightItem}>{h}</li>
+                  <motion.li 
+                    key={i} 
+                    style={styles.highlightItem}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.1 * i }}
+                  >
+                    {h}
+                  </motion.li>
                 ))}
               </ul>
-              <button style={styles.packageButton}>View Details</button>
-            </div>
+              <motion.button 
+                style={styles.packageButton}
+                whileHover={{ scale: 1.03, backgroundColor: "#45a049" }}
+                whileTap={{ scale: 0.97 }}
+              >
+                View Details
+              </motion.button>
+            </motion.div>
           ))}
-        </div>
-      </div>
+        </motion.div>
+      </motion.div>
 
       {/* Outstation Tours Section */}
-      <div style={styles.outstationSection}>
-        <h2 style={styles.sectionTitle}>Outstation Tours</h2>
+      <div 
+        ref={sectionRefs.outstation}
+        id="outstation-section"
+        style={styles.outstationSection}
+      >
+        <motion.h2 
+          style={styles.sectionTitle}
+          initial={{ opacity: 0, y: 20 }}
+          animate={isVisible["outstation-section"] ? { opacity: 1, y: 0 } : {}}
+          transition={{ duration: 0.5 }}
+        >
+          Outstation Tours
+        </motion.h2>
         <div style={styles.destinationGrid}>
           <div style={styles.destinationColumn}>
             {['MANABALE SHWAR', 'LONAVALA', 'GOA'].map((dest, index) => (
-              <div key={index} style={styles.destinationCard}>
+              <motion.div 
+                key={index} 
+                style={styles.destinationCard}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isVisible["outstation-section"] ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.2 * index, duration: 0.5 }}
+                whileHover={{ 
+                  scale: 1.03, 
+                  boxShadow: "0 10px 25px rgba(0,0,0,0.15)",
+                  borderLeft: "8px solid #FF6B6B" 
+                }}
+              >
                 <FiMapPin style={styles.destinationIcon} />
                 <h3 style={styles.destinationTitle}>{dest}</h3>
                 <div style={styles.destinationInfo}>
                   <span><FiClock /> 12hrs</span>
                   <span><FiDollarSign /> ₹1999</span>
                 </div>
-                <button style={styles.destinationButton}>
+                <motion.button 
+                  style={styles.destinationButton}
+                  whileHover={{ scale: 1.05, backgroundColor: "#FF5252" }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   Book Now <FiArrowRight />
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             ))}
           </div>
 
           <div style={styles.destinationColumn}>
             {['AIRPORT TRANSFER', 'OUTSTATION', 'MUMBAI'].map((service, index) => (
-              <div key={index} style={styles.serviceCard}>
+              <motion.div 
+                key={index} 
+                style={styles.serviceCard}
+                initial={{ opacity: 0, y: 30 }}
+                animate={isVisible["outstation-section"] ? { opacity: 1, y: 0 } : {}}
+                transition={{ delay: 0.3 + (0.2 * index), duration: 0.5 }}
+                whileHover={{ 
+                  scale: 1.03, 
+                  boxShadow: "0 10px 20px rgba(0,0,0,0.1)",
+                  border: "2px solid #4CAF50" 
+                }}
+              >
                 <div style={styles.serviceHeader}>
                   {index % 2 === 0 ? <FiNavigation2 /> : <FiTruck />}
                   <h3 style={styles.serviceTitle}>{service}</h3>
                 </div>
-                <button style={styles.serviceButton}>
+                <motion.button 
+                  style={styles.serviceButton}
+                  whileHover={{ scale: 1.05, backgroundColor: "#45a049" }}
+                  whileTap={{ scale: 0.95 }}
+                >
                   View Rates <FiArrowRight />
-                </button>
-              </div>
+                </motion.button>
+              </motion.div>
             ))}
           </div>
         </div>
 
-        <div style={styles.specialOffer}>
+        <motion.div 
+          ref={sectionRefs.special}
+          id="special-section"
+          style={styles.specialOffer}
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={isVisible["special-section"] ? { scale: 1, opacity: 1 } : {}}
+          transition={{ duration: 0.6 }}
+          whileHover={{ 
+            scale: 1.02, 
+            boxShadow: "0 15px 30px rgba(0,0,0,0.2)" 
+          }}
+        >
           <div style={styles.offerContent}>
             <h2 style={styles.offerTitle}>Special Offer</h2>
             <p style={styles.offerText}>Free Roar Juice on all bookings!</p>
-            <button style={styles.offerButton}>
+            <motion.button 
+              style={styles.offerButton}
+              whileHover={{ scale: 1.05, backgroundColor: "#f0f0f0" }}
+              whileTap={{ scale: 0.95 }}
+            >
               Claim Now <FiGift />
-            </button>
+            </motion.button>
           </div>
-        </div>
+        </motion.div>
       </div>
+
+      {/* NEW: Testimonials Section */}
+      <motion.div 
+        style={styles.testimonialSection}
+        initial="hidden"
+        animate={isVisible["outstation-section"] ? "visible" : "hidden"}
+        variants={fadeIn}
+      >
+        <motion.h2 
+          style={styles.sectionTitle}
+          variants={slideUp}
+        >
+          Happy Travelers
+        </motion.h2>
+        <motion.div 
+          style={styles.testimonialGrid}
+          variants={staggerChildren}
+        >
+          {testimonials.map((testimonial, index) => (
+            <motion.div 
+              key={index} 
+              style={styles.testimonialCard}
+              variants={cardVariant}
+              whileHover="hover"
+            >
+              <FiStar style={styles.testimonialStar} />
+              <p style={styles.testimonialText}>"{testimonial.text}"</p>
+              <div style={styles.testimonialAuthor}>
+                <strong>{testimonial.name}</strong>
+                <span>{testimonial.location}</span>
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </motion.div>
       <Places/>
     </div>
-    
   );
 };
+
 // All styles
 const styles = {
   carousel: {
@@ -174,7 +411,6 @@ const styles = {
     position: "absolute",
     width: "100%",
     height: "100%",
-    transition: "transform 0.5s ease",
   },
   imageContainer: {
     position: "relative",
@@ -221,9 +457,6 @@ const styles = {
     borderRadius: "30px",
     cursor: "pointer",
     transition: "all 0.3s ease",
-    ":hover": {
-      backgroundColor: "#FF5252",
-    },
   },
   prevButton: {
     position: "absolute",
@@ -238,6 +471,7 @@ const styles = {
     cursor: "pointer",
     fontSize: "1.5rem",
     backdropFilter: "blur(5px)",
+    zIndex: 10,
   },
   nextButton: {
     position: "absolute",
@@ -252,6 +486,7 @@ const styles = {
     cursor: "pointer",
     fontSize: "1.5rem",
     backdropFilter: "blur(5px)",
+    zIndex: 10,
   },
   tourPackages: {
     padding: "4rem 2rem",
@@ -262,6 +497,18 @@ const styles = {
     fontSize: "2.2rem",
     marginBottom: "3rem",
     color: "#333",
+    position: "relative",
+    paddingBottom: "15px",
+    "&::after": {
+      content: '""',
+      position: "absolute",
+      bottom: 0,
+      left: "50%",
+      transform: "translateX(-50%)",
+      width: "80px",
+      height: "3px",
+      backgroundColor: "#FF6B6B",
+    }
   },
   packageGrid: {
     display: "grid",
@@ -275,10 +522,7 @@ const styles = {
     borderRadius: "10px",
     padding: "2rem",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-    transition: "transform 0.3s ease",
-    ":hover": {
-      transform: "translateY(-5px)",
-    },
+    transition: "transform 0.3s ease, box-shadow 0.3s ease",
   },
   packageTitle: {
     fontSize: "1.5rem",
@@ -309,9 +553,6 @@ const styles = {
     cursor: "pointer",
     width: "100%",
     transition: "all 0.3s ease",
-    ":hover": {
-      backgroundColor: "#45a049",
-    },
   },
   outstationSection: {
     padding: "4rem 2rem",
@@ -338,6 +579,7 @@ const styles = {
     padding: "1.5rem",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
     borderLeft: "4px solid #FF6B6B",
+    transition: "all 0.3s ease",
   },
   destinationIcon: {
     fontSize: "1.8rem",
@@ -365,12 +607,14 @@ const styles = {
     display: "flex",
     alignItems: "center",
     gap: "8px",
+    transition: "all 0.3s ease",
   },
   serviceCard: {
     backgroundColor: "#f8f9fa",
     borderRadius: "10px",
     padding: "1.5rem",
     border: "2px solid #eee",
+    transition: "all 0.3s ease",
   },
   serviceHeader: {
     display: "flex",
@@ -390,6 +634,7 @@ const styles = {
     border: "none",
     borderRadius: "30px",
     cursor: "pointer",
+    transition: "all 0.3s ease",
   },
   specialOffer: {
     marginTop: "4rem",
@@ -398,6 +643,8 @@ const styles = {
     padding: "2rem",
     textAlign: "center",
     color: "white",
+    transition: "all 0.3s ease",
+    boxShadow: "0 8px 15px rgba(255,107,107,0.2)",
   },
   offerTitle: {
     fontSize: "2rem",
@@ -419,9 +666,47 @@ const styles = {
     alignItems: "center",
     gap: "8px",
     margin: "0 auto",
-    ":hover": {
-      backgroundColor: "#f0f0f0",
-    },
+    transition: "all 0.3s ease",
+  },
+  // New testimonial section styles
+  testimonialSection: {
+    padding: "4rem 2rem",
+    backgroundColor: "#f0f8ff",
+  },
+  testimonialGrid: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "2rem",
+    maxWidth: "1200px",
+    margin: "0 auto",
+  },
+  testimonialCard: {
+    backgroundColor: "white",
+    borderRadius: "10px",
+    padding: "2rem",
+    boxShadow: "0 4px 10px rgba(0,0,0,0.08)",
+    transition: "all 0.3s ease",
+    display: "flex",
+    flexDirection: "column",
+  },
+  testimonialStar: {
+    fontSize: "2rem",
+    color: "#FFD700",
+    marginBottom: "1rem",
+  },
+  testimonialText: {
+    fontSize: "1rem",
+    lineHeight: "1.6",
+    color: "#555",
+    fontStyle: "italic",
+    marginBottom: "1.5rem",
+  },
+  testimonialAuthor: {
+    marginTop: "auto",
+    display: "flex",
+    flexDirection: "column",
+    borderTop: "1px solid #eee",
+    paddingTop: "1rem",
   },
 };
 
