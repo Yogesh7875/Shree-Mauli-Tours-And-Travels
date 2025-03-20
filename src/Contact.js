@@ -39,16 +39,7 @@ const ContactPage = () => {
 
   return (
     <div className="contact-container">
-      {/* Navigation */}
-      <nav className="navbar">
-        <div className="logo">Shri Mauli Tours & Travels</div>
-        <ul className="nav-links">
-          <li><a href="/">Home</a></li>
-          <li><a href="/services">Services</a></li>
-          <li><a href="/about">About Us</a></li>
-          <li className="active"><a href="/contact">Contact</a></li>
-        </ul>
-      </nav>
+      
 
       {/* Header Banner */}
       <div className="contact-banner">
@@ -191,7 +182,15 @@ const ContactPage = () => {
                 </div>
               </div>
             </div>
-
+            <div className="info-card">
+              <h3>Follow Us</h3>
+              <div className="social-icons">
+                <a href="https://facebook.com" className="social-icon"><Facebook /></a>
+                <a href="https://instagram.com" className="social-icon"><Instagram /></a>
+                <a href="https://twitter.com" className="social-icon"><Twitter /></a>
+              
+              </div>
+            </div>
          
           </div>
         </div>
@@ -225,10 +224,7 @@ const ContactPage = () => {
         </a>
       </div>
 
-      {/* Footer */}
-      <footer className="footer">
-        <p>© 2025 Shri Mauli Tours & Travels. All Rights Reserved.</p>
-      </footer>
+     
 
       <style jsx>{`
         /* Global Styles */
