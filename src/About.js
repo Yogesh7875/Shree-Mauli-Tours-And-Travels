@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import chardhamImg from './img/char-dham-yatra.jpg';
 
 const AboutUs = () => {
   const [animate, setAnimate] = useState(false);
@@ -9,63 +10,90 @@ const AboutUs = () => {
     whyChoose: false,
     features: false
   });
-  
+  const [windowSize, setWindowSize] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1200,
+    height: typeof window !== 'undefined' ? window.innerHeight : 800,
+  });
+
   useEffect(() => {
     // Initial animation
     setAnimate(true);
-    
+
+    // Handle window resize
+    const handleResize = () => {
+      setWindowSize({
+        width: window.innerWidth,
+        height: window.innerHeight,
+      });
+    };
+
     // Scroll animation handler
     const handleScroll = () => {
       const scrollPosition = window.scrollY + window.innerHeight;
-      
+
       // Get positions of each section
       const aboutSection = document.getElementById('about-section');
       const servicesSection = document.getElementById('services-section');
       const fleetSection = document.getElementById('fleet-section');
       const whyChooseSection = document.getElementById('why-choose-section');
       const featuresSection = document.getElementById('features-section');
-      
+
       // Check if sections are in view and update state
       if (aboutSection && scrollPosition > aboutSection.offsetTop + 100) {
         setScrolledSections(prev => ({ ...prev, about: true }));
       }
-      
+
       if (servicesSection && scrollPosition > servicesSection.offsetTop + 100) {
         setScrolledSections(prev => ({ ...prev, services: true }));
       }
-      
+
       if (fleetSection && scrollPosition > fleetSection.offsetTop + 100) {
         setScrolledSections(prev => ({ ...prev, fleet: true }));
       }
-      
+
       if (whyChooseSection && scrollPosition > whyChooseSection.offsetTop + 100) {
         setScrolledSections(prev => ({ ...prev, whyChoose: true }));
       }
-      
+
       if (featuresSection && scrollPosition > featuresSection.offsetTop + 100) {
         setScrolledSections(prev => ({ ...prev, features: true }));
       }
     };
-    
-    // Add scroll event listener
+
+    // Add event listeners
+    window.addEventListener('resize', handleResize);
     window.addEventListener('scroll', handleScroll);
-    
-    // Trigger initial check
+
+    // Trigger initial checks
+    handleResize();
     handleScroll();
-    
+
     // Clean up
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      window.removeEventListener('scroll', handleScroll);
+    };
   }, []);
 
-  // Define styles object for React
-  const styles = {
+  // Helper function to determine device type
+  const getDeviceType = () => {
+    const { width } = windowSize;
+    if (width < 576) return 'mobile';
+    if (width >= 576 && width < 992) return 'tablet';
+    return 'desktop';
+  };
+
+  const deviceType = getDeviceType();
+
+  // Base styles
+  const baseStyles = {
     aboutPage: {
       fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
       color: '#333',
       lineHeight: 1.6
     },
     heroSection: {
-      height: '400px',
+      height: deviceType === 'mobile' ? '250px' : deviceType === 'tablet' ? '350px' : '400px',
       backgroundImage: "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('/images/road-banner.jpg')",
       backgroundSize: 'cover',
       backgroundPosition: 'center',
@@ -79,25 +107,26 @@ const AboutUs = () => {
     heroContent: {
       opacity: animate ? 1 : 0,
       transform: animate ? 'translateY(0)' : 'translateY(30px)',
-      transition: 'opacity 1.5s ease, transform 1.5s ease'
+      transition: 'opacity 1.5s ease, transform 1.5s ease',
+      padding: deviceType === 'mobile' ? '0 20px' : '0'
     },
     heroContentH1: {
-      fontSize: '3.5rem',
+      fontSize: deviceType === 'mobile' ? '2rem' : deviceType === 'tablet' ? '3rem' : '3.5rem',
       marginBottom: '1rem',
       textShadow: '2px 2px 4px rgba(0, 0, 0, 0.5)'
     },
     heroContentP: {
-      fontSize: '1.5rem',
+      fontSize: deviceType === 'mobile' ? '1.1rem' : deviceType === 'tablet' ? '1.3rem' : '1.5rem',
       fontStyle: 'italic'
     },
     aboutContainer: {
       maxWidth: '1200px',
       margin: '0 auto',
-      padding: '2rem'
+      padding: deviceType === 'mobile' ? '1rem' : '2rem'
     },
     header: {
       textAlign: 'center',
-      marginBottom: '3rem',
+      marginBottom: deviceType === 'mobile' ? '2rem' : '3rem',
       paddingBottom: '1rem',
       opacity: animate ? 1 : 0,
       transform: animate ? 'translateY(0)' : 'translateY(-20px)',
@@ -105,12 +134,12 @@ const AboutUs = () => {
     },
     headerH1: {
       color: '#e63946',
-      fontSize: '2.5rem',
+      fontSize: deviceType === 'mobile' ? '1.8rem' : deviceType === 'tablet' ? '2.2rem' : '2.5rem',
       marginBottom: '0.5rem'
     },
     tagline: {
       color: '#457b9d',
-      fontSize: '1.2rem',
+      fontSize: deviceType === 'mobile' ? '1rem' : '1.2rem',
       fontStyle: 'italic',
       marginBottom: '1rem'
     },
@@ -132,8 +161,8 @@ const AboutUs = () => {
       transform: 'translateX(-50%)'
     },
     sectionBase: {
-      marginBottom: '4rem',
-      padding: '2rem',
+      marginBottom: deviceType === 'mobile' ? '2rem' : '4rem',
+      padding: deviceType === 'mobile' ? '1rem' : '2rem',
       backgroundColor: '#ffffff',
       borderRadius: '8px',
       boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
@@ -160,8 +189,8 @@ const AboutUs = () => {
     },
     h2: {
       color: '#1d3557',
-      fontSize: '2rem',
-      marginBottom: '1.5rem',
+      fontSize: deviceType === 'mobile' ? '1.5rem' : '2rem',
+      marginBottom: deviceType === 'mobile' ? '1rem' : '1.5rem',
       position: 'relative',
       paddingBottom: '0.5rem'
     },
@@ -176,12 +205,12 @@ const AboutUs = () => {
     },
     servicesGrid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-      gap: '2rem'
+      gridTemplateColumns: deviceType === 'mobile' ? '1fr' : deviceType === 'tablet' ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(250px, 1fr))',
+      gap: deviceType === 'mobile' ? '1rem' : '2rem'
     },
     serviceCard: {
       backgroundColor: '#f8f9fa',
-      padding: '1.5rem',
+      padding: deviceType === 'mobile' ? '1rem' : '1.5rem',
       borderRadius: '8px',
       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
       transition: 'transform 0.3s ease, box-shadow 0.3s ease'
@@ -191,22 +220,23 @@ const AboutUs = () => {
       boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)'
     },
     serviceIcon: {
-      fontSize: '1.8rem',
+      fontSize: deviceType === 'mobile' ? '1.5rem' : '1.8rem',
       color: '#e63946',
       marginBottom: '1rem'
     },
     serviceCardH3: {
       color: '#1d3557',
-      marginBottom: '0.5rem'
+      marginBottom: '0.5rem',
+      fontSize: deviceType === 'mobile' ? '1.2rem' : '1.3rem'
     },
     fleetGrid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-      gap: '2rem'
+      gridTemplateColumns: deviceType === 'mobile' ? '1fr' : deviceType === 'tablet' ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(200px, 1fr))',
+      gap: deviceType === 'mobile' ? '1rem' : '2rem'
     },
     fleetCard: {
       backgroundColor: '#f8f9fa',
-      padding: '1.5rem',
+      padding: deviceType === 'mobile' ? '1rem' : '1.5rem',
       borderRadius: '8px',
       textAlign: 'center',
       boxShadow: '0 2px 10px rgba(0, 0, 0, 0.05)',
@@ -217,24 +247,27 @@ const AboutUs = () => {
       boxShadow: '0 5px 15px rgba(0, 0, 0, 0.1)'
     },
     fleetIcon: {
-      fontSize: '2.5rem',
+      fontSize: deviceType === 'mobile' ? '2rem' : '2.5rem',
       marginBottom: '1rem'
     },
     fleetCardH3: {
       color: '#1d3557',
-      marginBottom: '0.5rem'
+      marginBottom: '0.5rem',
+      fontSize: deviceType === 'mobile' ? '1.2rem' : '1.3rem'
     },
     whyChooseContent: {
       display: 'flex',
       flexWrap: 'wrap',
-      gap: '2rem'
+      gap: deviceType === 'mobile' ? '1rem' : '2rem',
+      flexDirection: deviceType === 'mobile' ? 'column' : 'row'
     },
     whyChooseImage: {
-      flex: 1,
-      minWidth: '300px'
+      flex: deviceType === 'mobile' ? 'none' : 1,
+      minWidth: deviceType === 'mobile' ? '100%' : '300px',
+      marginBottom: deviceType === 'mobile' ? '1.5rem' : 0
     },
     imageContainer: {
-      height: '300px',
+      height: deviceType === 'mobile' ? '250px' : '300px',
       borderRadius: '8px',
       overflow: 'hidden',
       boxShadow: '0 4px 15px rgba(0, 0, 0, 0.1)'
@@ -249,18 +282,19 @@ const AboutUs = () => {
       transform: 'scale(1.05)'
     },
     whyChooseList: {
-      flex: 1,
-      minWidth: '300px'
+      flex: deviceType === 'mobile' ? 'none' : 1,
+      minWidth: deviceType === 'mobile' ? '100%' : '300px'
     },
     whyChooseListUl: {
       listStyleType: 'none',
       padding: 0
     },
     whyChooseListLi: {
-      padding: '0.8rem 0',
+      padding: deviceType === 'mobile' ? '0.6rem 0' : '0.8rem 0',
       position: 'relative',
       paddingLeft: '2rem',
-      transition: 'transform 0.3s ease'
+      transition: 'transform 0.3s ease',
+      fontSize: deviceType === 'mobile' ? '0.9rem' : '1rem'
     },
     whyChooseListLiHover: {
       transform: 'translateX(5px)'
@@ -274,16 +308,16 @@ const AboutUs = () => {
     },
     featuresGrid: {
       display: 'grid',
-      gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
-      gap: '2rem',
+      gridTemplateColumns: deviceType === 'mobile' ? '1fr' : deviceType === 'tablet' ? 'repeat(2, 1fr)' : 'repeat(auto-fit, minmax(250px, 1fr))',
+      gap: deviceType === 'mobile' ? '1rem' : '2rem',
       backgroundColor: '#1d3557',
-      padding: '2rem',
+      padding: deviceType === 'mobile' ? '1rem' : '2rem',
       borderRadius: '8px',
       color: 'white'
     },
     featureCard: {
       textAlign: 'center',
-      padding: '1.5rem',
+      padding: deviceType === 'mobile' ? '1rem' : '1.5rem',
       borderRadius: '8px',
       backgroundColor: 'rgba(255, 255, 255, 0.1)',
       transition: 'transform 0.3s ease, background-color 0.3s ease'
@@ -293,281 +327,226 @@ const AboutUs = () => {
       backgroundColor: 'rgba(255, 255, 255, 0.2)'
     },
     featureIcon: {
-      fontSize: '2.5rem',
+      fontSize: deviceType === 'mobile' ? '2rem' : '2.5rem',
       marginBottom: '1rem'
     },
     featureCardH3: {
       marginBottom: '0.5rem',
-      color: '#fff'
+      color: '#fff',
+      fontSize: deviceType === 'mobile' ? '1.2rem' : '1.3rem'
     },
     featureCardP: {
-      color: '#f1faee'
-    },
-    // Responsive styles will be handled with conditional rendering
-  };
-
-  // Responsive styles
-  const getResponsiveStyles = () => {
-    if (typeof window !== 'undefined' && window.innerWidth <= 768) {
-      return {
-        heroSection: {
-          ...styles.heroSection,
-          height: '300px'
-        },
-        heroContentH1: {
-          ...styles.heroContentH1,
-          fontSize: '2.5rem'
-        },
-        aboutContainer: {
-          ...styles.aboutContainer,
-          padding: '1rem'
-        },
-        headerH1: {
-          ...styles.headerH1,
-          fontSize: '2rem'
-        },
-        servicesGrid: {
-          ...styles.servicesGrid,
-          gridTemplateColumns: '1fr'
-        },
-        fleetGrid: {
-          ...styles.fleetGrid,
-          gridTemplateColumns: '1fr'
-        },
-        featuresGrid: {
-          ...styles.featuresGrid,
-          gridTemplateColumns: '1fr'
-        },
-        whyChooseContent: {
-          ...styles.whyChooseContent,
-          flexDirection: 'column'
-        },
-        whyChooseImage: {
-          ...styles.whyChooseImage,
-          marginBottom: '1.5rem'
-        }
-      };
+      color: '#f1faee',
+      fontSize: deviceType === 'mobile' ? '0.9rem' : '1rem'
     }
-    return {};
-  };
-
-  // Combine base styles with responsive styles
-  const responsiveStyles = getResponsiveStyles();
-  const combinedStyles = {
-    ...styles,
-    ...responsiveStyles
   };
 
   // Enhanced section styles with animation states
   const getSectionStyle = (section) => {
     return {
-      ...styles.sectionBase,
-      ...(scrolledSections[section] ? styles.sectionVisible : styles.sectionHidden)
+      ...baseStyles.sectionBase,
+      ...(scrolledSections[section] ? baseStyles.sectionVisible : baseStyles.sectionHidden)
     };
   };
 
   return (
-    <div style={combinedStyles.aboutPage}>
+    <div style={baseStyles.aboutPage}>
       {/* Hero Section */}
-      <div style={combinedStyles.heroSection}>
-        <div style={combinedStyles.heroContent}>
-          <h1 style={combinedStyles.heroContentH1}>About Us</h1>
-          <p style={combinedStyles.heroContentP}>Discover Our Journey</p>
+      <div style={baseStyles.heroSection}>
+        <div style={baseStyles.heroContent}>
+          <h1 style={baseStyles.heroContentH1}>About Us</h1>
+          <p style={baseStyles.heroContentP}>Discover Our Journey</p>
         </div>
       </div>
-      
+
       {/* Main Content */}
-      <div style={combinedStyles.aboutContainer}>
+      <div style={baseStyles.aboutContainer}>
         {/* Header */}
-        <header style={combinedStyles.header}>
-          <h1 style={combinedStyles.headerH1}>Shree Mauli Tours and Travels</h1>
-          <div style={combinedStyles.tagline}>Explore Maharashtra with Comfort and Care</div>
-          <div style={combinedStyles.headerUnderline}>
-            <div style={combinedStyles.headerUnderlineBefore}></div>
+        <header style={baseStyles.header}>
+          <h1 style={baseStyles.headerH1}>Shree Mauli Tours and Travels</h1>
+          <div style={baseStyles.tagline}>Explore Maharashtra with Comfort and Care</div>
+          <div style={baseStyles.headerUnderline}>
+            <div style={baseStyles.headerUnderlineBefore}></div>
           </div>
         </header>
-        
+
         {/* About Section */}
         <div id="about-section" style={getSectionStyle('about')}>
-          <h2 style={combinedStyles.h2}>
+          <h2 style={baseStyles.h2}>
             About Our Company
-            <span style={combinedStyles.h2After}></span>
+            <span style={baseStyles.h2After}></span>
           </h2>
           <p>
-            Established with a passion for travel, Shree Mauli Tours and Travels is dedicated to providing 
-            exceptional travel experiences throughout Maharashtra. We specialize in pilgrimage tours, 
+            Established with a passion for travel, Shree Mauli Tours and Travels is dedicated to providing
+            exceptional travel experiences throughout Maharashtra. We specialize in pilgrimage tours,
             Maharashtra sightseeing packages, educational trips, and visits to holy sites.
           </p>
           <p>
-            It takes enormous efforts and constant devotion to establish such a platform that can perform 
-            as per the expectations of the clients and provide them with the travel service of their choice. 
-            At Shree Mauli Tours and Travels, we work 24/7 to establish a platform which can ensure quality 
-            services for the different parts of Maharashtra. We are established to facilitate the traveling 
+            It takes enormous efforts and constant devotion to establish such a platform that can perform
+            as per the expectations of the clients and provide them with the travel service of their choice.
+            At Shree Mauli Tours and Travels, we work 24/7 to establish a platform which can ensure quality
+            services for the different parts of Maharashtra. We are established to facilitate the traveling
             needs of the common man as well as corporate clients.
           </p>
         </div>
-        
+
         {/* Services Section */}
-        <div 
-          id="services-section" 
+        <div
+          id="services-section"
           style={{
-            ...styles.sectionBase,
-            ...(scrolledSections.services ? styles.sectionVisible : styles.sectionHiddenRight)
+            ...baseStyles.sectionBase,
+            ...(scrolledSections.services ? baseStyles.sectionVisible : baseStyles.sectionHiddenRight)
           }}
         >
-          <h2 style={combinedStyles.h2}>
+          <h2 style={baseStyles.h2}>
             Our Services
-            <span style={combinedStyles.h2After}></span>
+            <span style={baseStyles.h2After}></span>
           </h2>
-          <div style={combinedStyles.servicesGrid}>
-            <div style={combinedStyles.serviceCard}>
-              <div style={combinedStyles.serviceIcon}>✓</div>
-              <h3 style={combinedStyles.serviceCardH3}>Four Dham Pilgrimages</h3>
+          <div style={baseStyles.servicesGrid}>
+            <div style={baseStyles.serviceCard}>
+              <div style={baseStyles.serviceIcon}>✓</div>
+              <h3 style={baseStyles.serviceCardH3}>Four Dham Pilgrimages</h3>
               <p>Experience spiritual journeys to the holy sites with our guided tours.</p>
             </div>
-            <div style={combinedStyles.serviceCard}>
-              <div style={combinedStyles.serviceIcon}>✓</div>
-              <h3 style={combinedStyles.serviceCardH3}>Maharashtra Sightseeing</h3>
+            <div style={baseStyles.serviceCard}>
+              <div style={baseStyles.serviceIcon}>✓</div>
+              <h3 style={baseStyles.serviceCardH3}>Maharashtra Sightseeing</h3>
               <p>Explore the beauty and culture of Maharashtra with our curated packages.</p>
             </div>
-            <div style={combinedStyles.serviceCard}>
-              <div style={combinedStyles.serviceIcon}>✓</div>
-              <h3 style={combinedStyles.serviceCardH3}>Educational Field Trips</h3>
+            <div style={baseStyles.serviceCard}>
+              <div style={baseStyles.serviceIcon}>✓</div>
+              <h3 style={baseStyles.serviceCardH3}>Educational Field Trips</h3>
               <p>Organized educational tours for schools and colleges with learning experiences.</p>
             </div>
-            <div style={combinedStyles.serviceCard}>
-              <div style={combinedStyles.serviceIcon}>✓</div>
-              <h3 style={combinedStyles.serviceCardH3}>Holy Site Visits</h3>
+            <div style={baseStyles.serviceCard}>
+              <div style={baseStyles.serviceIcon}>✓</div>
+              <h3 style={baseStyles.serviceCardH3}>Holy Site Visits</h3>
               <p>Visit sacred and historical places with knowledgeable guides.</p>
             </div>
           </div>
         </div>
-        
+
         {/* Fleet Section */}
-        <div 
-          id="fleet-section" 
+        <div
+          id="fleet-section"
           style={{
-            ...styles.sectionBase,
-            ...(scrolledSections.fleet ? styles.sectionVisible : styles.sectionHidden),
+            ...baseStyles.sectionBase,
+            ...(scrolledSections.fleet ? baseStyles.sectionVisible : baseStyles.sectionHidden),
             transition: 'opacity 1s ease, transform 1s ease'
           }}
         >
-          <h2 style={combinedStyles.h2}>
+          <h2 style={baseStyles.h2}>
             Our Fleet
-            <span style={combinedStyles.h2After}></span>
+            <span style={baseStyles.h2After}></span>
           </h2>
           <p>We offer a range of comfortable vehicles to suit your travel needs:</p>
-          <div style={combinedStyles.fleetGrid}>
-            <div style={combinedStyles.fleetCard}>
-              <div style={combinedStyles.fleetIcon}>🚐</div>
-              <h3 style={combinedStyles.fleetCardH3}>16-Seater Bus</h3>
+          <div style={baseStyles.fleetGrid}>
+            <div style={baseStyles.fleetCard}>
+              <div style={baseStyles.fleetIcon}>🚐</div>
+              <h3 style={baseStyles.fleetCardH3}>16-Seater Bus</h3>
               <p>Perfect for small groups and family outings</p>
             </div>
-            <div style={combinedStyles.fleetCard}>
-              <div style={combinedStyles.fleetIcon}>🚐</div>
-              <h3 style={combinedStyles.fleetCardH3}>26-Seater Bus</h3>
+            <div style={baseStyles.fleetCard}>
+              <div style={baseStyles.fleetIcon}>🚐</div>
+              <h3 style={baseStyles.fleetCardH3}>26-Seater Bus</h3>
               <p>Ideal for medium-sized groups and school trips</p>
             </div>
-            <div style={combinedStyles.fleetCard}>
-              <div style={combinedStyles.fleetIcon}>🚌</div>
-              <h3 style={combinedStyles.fleetCardH3}>36-Seater Bus</h3>
+            <div style={baseStyles.fleetCard}>
+              <div style={baseStyles.fleetIcon}>🚌</div>
+              <h3 style={baseStyles.fleetCardH3}>36-Seater Bus</h3>
               <p>Comfortable travel for larger groups</p>
             </div>
-            <div style={combinedStyles.fleetCard}>
-              <div style={combinedStyles.fleetIcon}>🚌</div>
-              <h3 style={combinedStyles.fleetCardH3}>50-Seater Bus</h3>
+            <div style={baseStyles.fleetCard}>
+              <div style={baseStyles.fleetIcon}>🚌</div>
+              <h3 style={baseStyles.fleetCardH3}>50-Seater Bus</h3>
               <p>Spacious option for large groups and corporate events</p>
             </div>
           </div>
         </div>
-        
+
         {/* Why Choose Us Section */}
-        <div 
-          id="why-choose-section" 
+        <div
+          id="why-choose-section"
           style={{
-            ...styles.sectionBase,
-            ...(scrolledSections.whyChoose ? styles.sectionVisible : styles.sectionHidden),
+            ...baseStyles.sectionBase,
+            ...(scrolledSections.whyChoose ? baseStyles.sectionVisible : baseStyles.sectionHidden),
             transition: 'opacity 1s ease, transform 1s ease'
           }}
         >
-          <h2 style={combinedStyles.h2}>
+          <h2 style={baseStyles.h2}>
             Why Choose Shree Mauli Tours and Travels?
-            <span style={combinedStyles.h2After}></span>
+            <span style={baseStyles.h2After}></span>
           </h2>
-          <div style={combinedStyles.whyChooseContent}>
-            <div style={combinedStyles.whyChooseImage}>
-              <div style={combinedStyles.imageContainer}>
-                <img src="/about.jpg" alt="Shree Mauli Tours and Travels" style={combinedStyles.aboutImg} />
+          <div style={baseStyles.whyChooseContent}>
+            <div style={baseStyles.whyChooseImage}>
+              <div style={baseStyles.imageContainer}>
+                <img src={chardhamImg} alt="Char Dham Tour with Shree Mauli" style={baseStyles.aboutImg} />
               </div>
             </div>
-            <div style={combinedStyles.whyChooseList}>
-              <ul style={combinedStyles.whyChooseListUl}>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Customer security and safety is guaranteed
+            <div style={baseStyles.whyChooseList}>
+              <ul style={baseStyles.whyChooseListUl}>
+                <li style={baseStyles.whyChooseListLi}>
+                  <span style={baseStyles.whyChooseListLiBefore}>✓</span>
+                  Specialized in Char Dham Yatra with expert Himalayan route drivers
                 </li>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Free masks for passengers
+                <li style={baseStyles.whyChooseListLi}>
+                  <span style={baseStyles.whyChooseListLiBefore}>✓</span>
+                  Experienced in organizing safe and educational school trips
                 </li>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Fully sanitized vehicles with trained drivers
+                <li style={baseStyles.whyChooseListLi}>
+                  <span style={baseStyles.whyChooseListLiBefore}>✓</span>
+                  Well-maintained, high-clearance vehicles for mountain terrain
                 </li>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Comfortable seating arrangements
+                <li style={baseStyles.whyChooseListLi}>
+                  <span style={baseStyles.whyChooseListLiBefore}>✓</span>
+                  Complete pilgrimage packages including accommodation and meals
                 </li>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Satisfaction of all customers
+                <li style={baseStyles.whyChooseListLi}>
+                  <span style={baseStyles.whyChooseListLiBefore}>✓</span>
+                  Customized educational itineraries for student groups
                 </li>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Easy booking with instant confirmation
+                <li style={baseStyles.whyChooseListLi}>
+                  <span style={baseStyles.whyChooseListLiBefore}>✓</span>
+                  Experienced tour guides for religious and educational tours
                 </li>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Transparent billing with no hidden fees
+                <li style={baseStyles.whyChooseListLi}>
+                  <span style={baseStyles.whyChooseListLiBefore}>✓</span>
+                  Special student discounts and group packages
                 </li>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Door-to-door pickup and drop-off service
-                </li>
-                <li style={combinedStyles.whyChooseListLi}>
-                  <span style={combinedStyles.whyChooseListLiBefore}>✓</span>
-                  Customer-friendly cancellation policy
+                <li style={baseStyles.whyChooseListLi}>
+                  <span style={baseStyles.whyChooseListLiBefore}>✓</span>
+                  24/7 support during your pilgrimage or educational tour
                 </li>
               </ul>
             </div>
           </div>
         </div>
-        
+
         {/* Features Section */}
-        <div 
-          id="features-section" 
+        <div
+          id="features-section"
           style={{
-            ...styles.sectionBase,
-            ...(scrolledSections.features ? styles.sectionVisible : styles.sectionDelayed),
+            ...baseStyles.sectionBase,
+            ...(scrolledSections.features ? baseStyles.sectionVisible : baseStyles.sectionDelayed),
             transition: 'opacity 1s ease, transform 1s ease',
             transitionDelay: scrolledSections.features ? '0s' : '0.3s'
           }}
         >
-          <div style={combinedStyles.featuresGrid}>
-            <div style={combinedStyles.featureCard}>
-              <div style={combinedStyles.featureIcon}>💰</div>
-              <h3 style={combinedStyles.featureCardH3}>AFFORDABLE PRICE</h3>
-              <p style={combinedStyles.featureCardP}>Best in the market competitive pricing for all our services</p>
+          <div style={baseStyles.featuresGrid}>
+            <div style={baseStyles.featureCard}>
+              <div style={baseStyles.featureIcon}>💰</div>
+              <h3 style={baseStyles.featureCardH3}>AFFORDABLE PRICE</h3>
+              <p style={baseStyles.featureCardP}>Best in the market competitive pricing for all our services</p>
             </div>
-            <div style={combinedStyles.featureCard}>
-              <div style={combinedStyles.featureIcon}>🧭</div>
-              <h3 style={combinedStyles.featureCardH3}>BEST DESTINATIONS</h3>
-              <p style={combinedStyles.featureCardP}>Choose from 500+ destinations across Maharashtra</p>
+            <div style={baseStyles.featureCard}>
+              <div style={baseStyles.featureIcon}>🧭</div>
+              <h3 style={baseStyles.featureCardH3}>BEST DESTINATIONS</h3>
+              <p style={baseStyles.featureCardP}>Choose from 500+ destinations across Maharashtra</p>
             </div>
-            <div style={combinedStyles.featureCard}>
-              <div style={combinedStyles.featureIcon}>👤</div>
-              <h3 style={combinedStyles.featureCardH3}>PERSONAL SERVICE</h3>
-              <p style={combinedStyles.featureCardP}>Quality service with well-mannered, professional drivers</p>
+            <div style={baseStyles.featureCard}>
+              <div style={baseStyles.featureIcon}>👤</div>
+              <h3 style={baseStyles.featureCardH3}>PERSONAL SERVICE</h3>
+              <p style={baseStyles.featureCardP}>Quality service with well-mannered, professional drivers</p>
             </div>
           </div>
         </div>
